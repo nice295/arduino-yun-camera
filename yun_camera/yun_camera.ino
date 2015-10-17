@@ -12,7 +12,9 @@ String filename;
 int pir_pin = 8;
 
 // Path
-String path = "/mnt/sda1/";
+String path = "/www/nice295";
+
+unsigned long time = 0;
 
 void setup() {
   
@@ -23,10 +25,30 @@ void setup() {
   pinMode(pir_pin,INPUT);
 }
 
+void wifiCheck() {
+  Process wifiCheck;  // initialize a new process
+
+  Serial.println();
+
+  wifiCheck.runShellCommand("/usr/bin/pretty-wifi-info.lua");  // command you want to run
+
+  // while there's any characters coming back from the
+  // process, print them to the serial monitor:
+  while (wifiCheck.available() > 0) {
+    char c = wifiCheck.read();
+    Serial.print(c);
+  }
+
+  Serial.println();
+
+}
 void loop(void) 
 {
   
-  if (digitalRead(pir_pin) == true) {
+  //if (digitalRead(pir_pin) == true) {
+  if (millis() > time + 10*1000) {
+    wifiCheck();
+    time = millis();
     
     // Generate filename with timestamp
     filename = "";
