@@ -5,15 +5,6 @@
 // Picture process
 Process picture;
 
-// Filename
-String filename;
-
-// Pin
-int pir_pin = 8;
-
-// Path
-String path = "/www/nice295";
-
 unsigned long time = 0;
 
 void setup() {
@@ -21,8 +12,6 @@ void setup() {
   // Bridge
   Bridge.begin();
   
-  // Set pin mode
-  pinMode(pir_pin,INPUT);
 }
 
 void wifiCheck() {
@@ -42,6 +31,9 @@ void wifiCheck() {
   Serial.println();
 
 }
+
+int idx = 10;
+  
 void loop(void) 
 {
   
@@ -50,24 +42,17 @@ void loop(void)
     wifiCheck();
     time = millis();
     
-    // Generate filename with timestamp
-    filename = "";
-    picture.runShellCommand("date +%s");
-    while(picture.running());
-
-    while (picture.available()>0) {
-      char c = picture.read();
-      filename += c;
-    } 
-    filename.trim();
-    filename += ".png";
- 
     // Take picture
-    picture.runShellCommand("fswebcam " + path + filename + " -r 1280x720");
+    picture.runShellCommand("fswebcam -r 1280x720 /www/nice295/_pic.jpg --crop 300x400 /www/nice295/pic.jpg");
     while(picture.running());
     
     // Upload to Dropbox
-    picture.runShellCommand("python " + path + "upload_picture.py " + path + filename);
+    picture.runShellCommand("python /www/nice295/upload_picture.py " + String(idx) + " /www/nice295/pic.jpg");
     while(picture.running());
+
+    Serial.print("Success to upload pic.jpg");
+    Serial.println();    
+
+    idx++;
   }
 }
